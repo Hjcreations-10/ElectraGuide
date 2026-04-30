@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", "Georgia", serif;
+}
+
+@layer base {
+  .italic-serif {
+    --font-serif-italic: italic;
+  }
+}
+
+.italic-serif h1, .italic-serif h2, .italic-serif h3, .italic-serif h4 {
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+body {
+  @apply antialiased overflow-x-hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f97316;
+  border-radius: 10px;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.scanline::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, transparent, rgba(249, 115, 22, 0.1), transparent);
+  animation: scanline 3s linear infinite;
+  pointer-events: none;
+}

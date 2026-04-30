@@ -1,0 +1,6 @@
+{
+  "name": "ElectraGuide",
+  "description": "A multilingual election assistant for voter registration, interactive voting guidance, and historical data analysis based on Election Commission of India (ECI) standards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["AI-powered insights", "Interactive charts", "Multilingual guidance"]
+}
