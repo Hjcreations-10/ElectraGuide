@@ -1,20 +1,85 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# ElectraGuide: Secure Digital Voting System with AI Analytics
 
-# Run and deploy your AI Studio app
+ElectraGuide is a professional-grade, full-stack digital voting platform designed for high security, transparency, and real-time intelligence. Built with a focus on integrity, it features anonymous ballot storage, fraud detection, and comprehensive analytics.
 
-This contains everything you need to run your app locally.
+## 🚀 Features
 
-View your app in AI Studio: https://ai.studio/apps/b3c402c9-e141-4652-ae97-66340e45fff2
+### 👤 Authentication & Role-Based Access
+- **Secure Registration:** Voter ID (EPIC) validation and password hashing (bcrypt).
+- **JWT Protection:** State-of-the-art token-based session management.
+- **Roles:** Clear separation between **Voters** and **Admins**.
 
-## Run Locally
+### 🗳️ Voting Integrity
+- **One-User-One-Vote:** Strict enforcement at both API and Database levels.
+- **Anonymous Ballots:** Votes are stored using SHA-256 hashes of User IDs, ensuring your ballot cannot be traced back to you.
+- **Time Windows:** Admins can schedule elections with precise start and end times.
+- **Interactive UI:** Real-time countdowns and post-vote confirmation.
 
-**Prerequisites:**  Node.js
+### 📊 Admin Intelligence (Power BI Ready)
+- **KPI Dashboard:** Monitor total voters, live turnout %, and risk levels.
+- **Live Charts:** Visual representation of candidate performance and peak voting hours.
+- **Fraud Detection:** Automated flagging of suspicious login patterns and IP collisions.
+- **Power BI Integration:** One-click CSV export designed for instant import into Power BI for deep data analysis.
 
+### 🛡️ Advanced Security
+- **Rate Limiting:** Protection against brute-force attacks and spam voting.
+- **Brute Force Protection:** Automated account locking after multiple failed attempts.
+- **Input Sanitization:** Protection against XSS and NoSQL injection.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🛠️ Tech Stack
+
+- **Frontend:** React 18, Vite, Tailwind CSS (via Index CSS), Lucide Icons, Recharts, Motion (Framer).
+- **Backend:** Node.js, Express, TypeScript.
+- **Database:** MongoDB (with Mongoose ODM).
+- **Security:** JWT, BcryptJS, Express-Rate-Limit.
+
+## 📂 Project Structure
+
+```text
+/server
+  /models       # MongoDB Schemas (User, Candidate, Vote, Election)
+  /routes       # API Endpoints (Auth, Voting, Admin)
+  /middleware   # Auth guards & Error handlers
+  /utils        # Token gen & Validations
+/src
+  /context      # Global Auth State
+  /pages        # UI Views (Auth, Voter, Admin)
+  /services     # API Client (Axios)
+  index.css     # Premium Design System
+```
+
+## ⚙️ Setup Instructions
+
+### 1. Backend Setup
+1. Navigate to the root directory.
+2. Create a `.env` file based on `.env.example`.
+3. Provide your `MONGODB_URI` (Local or Atlas).
+4. Run `npm install`.
+5. Start the server: `npm run server`.
+
+### 2. Frontend Setup
+1. In another terminal, run `npm install`.
+2. Start the dev server: `npm run dev`.
+3. Access the app at `http://localhost:3000`.
+
+### 🔑 Demo Credentials
+- **Admin:** `admin@electra.gov` / `Admin@123` (Note: Set `ALLOW_ADMIN_REGISTER=true` in `.env` to create an admin first)
+- **Voter:** `voter@electra.gov` / `Voter@123`
+
+## 📊 Power BI Integration
+
+1. Login as Admin.
+2. Navigate to the **Intelligence** tab.
+3. Click **"Power BI Export"**.
+4. Import the downloaded `electraguide_export.csv` into Power BI.
+5. Use the following columns for visualizations:
+   - `Candidate Performance`: Use `Candidate` and `Total Votes`.
+   - `Voting Trends`: Use `Hour` and `Votes Cast`.
+   - `Fraud Monitor`: Check `Anonymised Vote Log` for timestamp anomalies.
+
+## 🛡️ Security Audit
+- [x] Password Hashing (Bcrypt)
+- [x] JWT Expiration (7 days)
+- [x] Route Protection (Admin/Voter Guards)
+- [x] IP-based Rate Limiting
+- [x] Anonymised Vote Storage (SHA-256)
