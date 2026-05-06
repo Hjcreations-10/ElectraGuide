@@ -10,6 +10,7 @@
     "server": "tsx watch server/index.ts",
     "server:start": "node dist/server/index.js",
     "seed": "tsx server/seed.ts",
+    "mock": "tsx server/mock-server.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

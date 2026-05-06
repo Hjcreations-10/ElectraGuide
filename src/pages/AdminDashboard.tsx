@@ -128,6 +128,34 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Power BI Integration Guide */}
+      <div className="glass p-8 border-l-4 border-l-accent">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="flex-1">
+            <h3 className="text-xl font-black italic uppercase tracking-tight mb-2 flex items-center gap-2">
+              <BarChart3 className="text-accent" /> Power BI Intelligence Engine
+            </h3>
+            <p className="text-text-muted text-sm leading-relaxed">
+              Unlock deep voter behavioral patterns and demographic trends. Use the export below to sync this live data with Microsoft Power BI.
+            </p>
+            <div className="flex gap-4 mt-4">
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-text-faint">
+                <div className="w-1.5 h-1.5 bg-success rounded-full" /> Trend Analysis
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-text-faint">
+                <div className="w-1.5 h-1.5 bg-success rounded-full" /> Voter Share
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-text-faint">
+                <div className="w-1.5 h-1.5 bg-success rounded-full" /> Fraud Clusters
+              </div>
+            </div>
+          </div>
+          <button onClick={handleExportCSV} className="btn-accent px-10 py-4 shadow-xl shadow-accent/20 animate-pulse">
+            <Download className="w-5 h-5" /> Generate Power BI Dataset
+          </button>
+        </div>
+      </div>
+
       {/* KPI Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="stat-card purple">
