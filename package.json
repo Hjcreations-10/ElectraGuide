@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "server": "tsx watch server/index.ts",
     "server:start": "node dist/server/index.js",
+    "seed": "tsx server/seed.ts",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
