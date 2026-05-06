@@ -56,6 +56,23 @@ app.get('/api/admin/stats', (req, res) => {
   });
 });
 
+app.get('/api/admin/export/csv', (req, res) => {
+  const csv = `--- ELECTION SUMMARY ---
+Metric,Value
+Election Title,Mock General Election 2026
+Total Registered Voters,1200
+Total Votes Cast,845
+Voter Turnout %,70.4
+--- CANDIDATE PERFORMANCE ---
+Candidate,Party,Total Votes,Vote Share %
+Arjun Sharma,BPP,350,41.42
+Sarah Joseph,SJF,295,34.91
+Vikram Singh,NUA,200,23.67`;
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename=mock_powerbi_export.csv');
+  res.send(csv);
+});
+
 app.listen(5000, () => {
   console.log('🚀 MOCK SERVER RUNNING on http://localhost:5000');
   console.log('⚠️ Note: This is a temporary mock server because MongoDB is not detected on your system.');

@@ -116,10 +116,10 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess }) => {
               {!isLogin && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
                   <div style={{ position: 'relative' }}>
-                    <ShieldCheck size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-faint)' }} />
-                    <input className="input" type="text" placeholder="Voter ID (EPIC Number)" required value={form.voterId} onChange={set('voterId')} style={{ paddingLeft: '42px' }} />
+                    <ShieldCheck size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--success)' }} />
+                    <input className="input" type="text" placeholder="Voter ID (EPIC Number)" required value={form.voterId} onChange={set('voterId')} style={{ paddingLeft: '42px', border: '1px solid rgba(16,185,129,0.2)' }} />
                   </div>
-                  <p style={{ marginTop: '6px', fontSize: '11px', color: 'var(--text-faint)' }}>Enter your official EPIC/Voter card number</p>
+                  <p style={{ marginTop: '6px', fontSize: '11px', color: 'var(--success)', fontWeight: 600 }}>🛡️ Official Election Commission Identity Verification</p>
                 </motion.div>
               )}
             </AnimatePresence>

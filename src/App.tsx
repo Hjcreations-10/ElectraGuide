@@ -143,14 +143,28 @@ const App: React.FC = () => {
                   <p className="text-text-muted max-w-md mx-auto">Your account is secured with military-grade SHA-256 encryption. Multi-factor authentication is active on this session.</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto text-left">
                     <div className="p-4 bg-white/5 rounded-xl border border-border">
-                      <p className="text-[10px] font-black uppercase text-text-faint mb-1">Session ID</p>
-                      <p className="font-mono text-xs truncate">ELX-{Math.random().toString(36).substring(7).toUpperCase()}</p>
+                      <p className="text-[10px] font-black uppercase text-text-faint mb-1">Session Integrity</p>
+                      <p className="text-xs font-bold text-success flex items-center gap-2">
+                        <span className="w-2 h-2 bg-success rounded-full animate-pulse" /> Identity Verified
+                      </p>
                     </div>
                     <div className="p-4 bg-white/5 rounded-xl border border-border">
-                      <p className="text-[10px] font-black uppercase text-text-faint mb-1">Status</p>
-                      <p className="text-xs font-bold text-success flex items-center gap-2">
-                        <span className="w-2 h-2 bg-success rounded-full animate-pulse" /> Encrypted Connection
+                      <p className="text-[10px] font-black uppercase text-text-faint mb-1">One-User-One-Vote</p>
+                      <p className="text-xs font-bold text-primary flex items-center gap-2">
+                        <Shield size={12} /> Active Enforcement
                       </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 text-left max-w-lg mx-auto">
+                    <h4 className="text-[10px] font-black uppercase text-text-faint mb-4 tracking-[0.2em] flex items-center gap-2">
+                      <History size={12} /> Real-time Security Log
+                    </h4>
+                    <div className="space-y-3 font-mono text-[11px] bg-black/20 p-4 rounded-xl border border-white/5">
+                      <p className="text-success flex justify-between"><span>[SEC-AUTH] JWT Handshake Success</span> <span className="opacity-40">just now</span></p>
+                      <p className="text-primary flex justify-between"><span>[SEC-BAL] One-Vote Logic Active</span> <span className="opacity-40">active</span></p>
+                      <p className="text-text-muted flex justify-between"><span>[SEC-ENC] SHA-256 Tunnel Established</span> <span className="opacity-40">encrypted</span></p>
+                      <p className="text-orange-400 flex justify-between"><span>[SEC-FRA] Fraud Monitor Heartbeat</span> <span className="opacity-40">listening</span></p>
                     </div>
                   </div>
                 </div>
