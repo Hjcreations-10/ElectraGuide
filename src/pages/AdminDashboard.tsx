@@ -194,6 +194,9 @@ const AdminDashboard: React.FC = () => {
           </div>
           <p className="text-3xl font-black italic">{data?.stats?.turnout}%</p>
           <p className="text-text-faint text-xs font-bold uppercase mt-1">Voter Turnout Rate</p>
+          <div className="progress-bar mt-4">
+            <div className="progress-fill" style={{ width: `${data?.stats?.turnout}%` }} />
+          </div>
         </div>
 
         <div className="stat-card red">
