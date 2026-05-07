@@ -75,11 +75,14 @@ const startServer = async () => {
       serverSelectionTimeoutMS: 5000
     });
     console.log(`✅ MongoDB connected: ${MONGODB_URI.split('@').pop() || 'local'}`);
-
-    app.listen(PORT, () => {
-      console.log(`🚀 ElectraGuide server running on http://localhost:${PORT}`);
-      console.log(`📊 Admin CSV export: http://localhost:${PORT}/api/admin/export/csv`);
-    });
+    
+    // Only start the listener if we are running locally
+    if (process.env.NODE_ENV !== 'production') {
+      app.listen(PORT, () => {
+        console.log(`🚀 ElectraGuide server running on http://localhost:${PORT}`);
+        console.log(`📊 Admin CSV export: http://localhost:${PORT}/api/admin/export/csv`);
+      });
+    }
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error);
     process.exit(1);
