@@ -1,6 +1,20 @@
 # ElectraGuide: Secure Digital Voting System with AI Analytics
 
-ElectraGuide is a professional-grade, full-stack digital voting platform designed for high security, transparency, and real-time intelligence. Built with a focus on integrity, it features anonymous ballot storage, fraud detection, and comprehensive analytics.
+## 🚀 Production Deployment (Vercel)
+
+1.  **Database**: Create a cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2.  **Environment Variables**: In Vercel, add:
+    *   `MONGODB_URI`: Your Atlas connection string.
+    *   `JWT_SECRET`: A secure random string.
+    *   `VOTE_HASH_SECRET`: A random string for anonymising votes.
+3.  **Push**: `git push origin main`
+
+## 📊 Power BI Integration
+
+The platform provides a premium CSV export optimized for Power BI forensics:
+1. Go to **Intelligence** (Admin only).
+2. Click **Export Power BI Dataset**.
+3. Import the `.csv` into Power BI Desktop to visualize voter turnout, fraud patterns, and real-time results.
 
 ## 🚀 Features
 

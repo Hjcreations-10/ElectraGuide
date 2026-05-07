@@ -85,7 +85,9 @@ const startServer = async () => {
     }
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error);
-    process.exit(1);
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1);
+    }
   }
 };
 
