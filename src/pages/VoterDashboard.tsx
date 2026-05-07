@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { votingAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { CandidateSkeleton } from '../components/Skeleton';
 
 const PARTY_COLORS: Record<string, string> = {
   '#6366f1': 'rgba(99,102,241,0.15)',
@@ -17,6 +19,7 @@ const PARTY_COLORS: Record<string, string> = {
 };
 
 const VoterDashboard: React.FC = () => {
+  const { showToast } = useToast();
   const { user, refreshUser } = useAuth();
   const [candidates, setCandidates] = useState<any[]>([]);
   const [election, setElection] = useState<any>(null);
@@ -37,6 +40,7 @@ const VoterDashboard: React.FC = () => {
       setElection(statusRes.data.election);
       setTimeRemaining(statusRes.data.timeRemaining || 0);
     } catch (err: any) {
+      showToast('Failed to load election data', 'error');
       setError('Failed to load election data. Is the server running?');
     } finally {
       setLoading(false);
@@ -67,22 +71,19 @@ const VoterDashboard: React.FC = () => {
     setError('');
     try {
       const { data } = await votingAPI.castVote(candidateId);
+      showToast('Vote cast successfully!', 'success');
       setVoted(true);
       setVotedFor(data.votedFor);
       await refreshUser();
     } catch (err: any) {
+      showToast(err.response?.data?.message || 'Failed to cast vote', 'error');
       setError(err.response?.data?.message || 'Failed to cast vote.');
     } finally {
       setVoting(null);
     }
   };
 
-  if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '12px', color: 'var(--text-muted)' }}>
-      <Loader2 size={24} style={{ animation: 'spin 1s linear infinite' }} />
-      <span>Loading election data...</span>
-    </div>
-  );
+  if (loading) return <CandidateSkeleton />;
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>

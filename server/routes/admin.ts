@@ -280,6 +280,18 @@ router.get('/export/csv', async (req: AuthRequest, res: Response): Promise<void>
       const cand = v.candidateId;
       rows.push(`${v._id},${cand?.name || 'N/A'},${cand?.party || 'N/A'},${v.timestamp.toISOString()},${v.hour}`);
     });
+    rows.push('');
+
+    // === Sheet 5: Security Anomalies ===
+    rows.push('--- SECURITY ANOMALIES ---');
+    rows.push('Voter ID,Name,Last IP,Login Attempts,Flagged');
+    const riskyUsers = await User.find({ 
+      $or: [{ isFlagged: true }, { loginAttempts: { $gt: 2 } }] 
+    }).select('voterId name lastLoginIp loginAttempts isFlagged');
+    
+    riskyUsers.forEach(u => {
+      rows.push(`${u.voterId},${u.name},${u.lastLoginIp || 'N/A'},${u.loginAttempts},${u.isFlagged}`);
+    });
 
     const csv = rows.join('\n');
     res.setHeader('Content-Type', 'text/csv');

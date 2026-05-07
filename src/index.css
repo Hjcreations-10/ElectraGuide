@@ -294,3 +294,29 @@ tr:last-child td { border-bottom: none; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .text-muted { color: var(--text-muted); }
 .text-faint { color: var(--text-faint); }
+
+/* ── Mobile Polish ─────────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+  }
+  
+  .p-8 { padding: 1.5rem !important; }
+  .p-12 { padding: 2rem !important; }
+  
+  .glass { border-radius: var(--radius); }
+  
+  h2 { font-size: 1.5rem !important; }
+  
+  .btn-primary, .btn-accent {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card { padding: 20px; }
+  .flex-wrap { flex-direction: column; }
+  .btn-primary, .btn-accent, .btn-ghost { width: 100%; }
+}

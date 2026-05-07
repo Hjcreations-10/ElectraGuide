@@ -27,6 +27,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess }) => {
       }
       onSuccess?.();
     } catch (err: any) {
+      console.error('Login Error:', err);
       setError(err.response?.data?.message || err.message || 'Something went wrong. Try again.');
     } finally {
       setLoading(false);

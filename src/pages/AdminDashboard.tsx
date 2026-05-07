@@ -10,8 +10,11 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
   ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area
 } from 'recharts';
+import { useToast } from '../context/ToastContext';
+import { DashboardSkeleton } from '../components/Skeleton';
 
 const AdminDashboard: React.FC = () => {
+  const { showToast } = useToast();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -28,6 +31,7 @@ const AdminDashboard: React.FC = () => {
         setData(data);
       }
     } catch (err: any) {
+      showToast('Failed to fetch intelligence metrics', 'error');
       setError('Failed to fetch admin stats');
     } finally {
       setLoading(false);
@@ -42,11 +46,12 @@ const AdminDashboard: React.FC = () => {
     e.preventDefault();
     try {
       await adminAPI.addCandidate(newCandidate);
+      showToast(`${newCandidate.name} added to the ballot`, 'success');
       setShowAddCandidate(false);
       setNewCandidate({ name: '', party: '', description: '', color: '#6366f1' });
       fetchStats();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to add candidate');
+      showToast(err.response?.data?.message || 'Failed to add candidate', 'error');
     }
   };
 
@@ -54,10 +59,11 @@ const AdminDashboard: React.FC = () => {
     e.preventDefault();
     try {
       await adminAPI.startElection(newElection);
+      showToast(`Election window "${newElection.title}" is now LIVE`, 'success');
       setShowStartElection(false);
       fetchStats();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to start election');
+      showToast(err.response?.data?.message || 'Failed to start election', 'error');
     }
   };
 
@@ -65,9 +71,10 @@ const AdminDashboard: React.FC = () => {
     if (!window.confirm('Are you sure you want to end the current election?')) return;
     try {
       await adminAPI.endElection();
+      showToast('Election window has been closed successfully', 'success');
       fetchStats();
     } catch (err) {
-      alert('Failed to end election');
+      showToast('System failed to terminate the election cycle', 'error');
     }
   };
 
@@ -80,26 +87,23 @@ const AdminDashboard: React.FC = () => {
       link.setAttribute('download', 'electraguide_export.csv');
       document.body.appendChild(link);
       link.click();
+      showToast('Power BI Dataset ready for download', 'success');
     } catch (err) {
-      alert('Failed to export CSV');
+      showToast('Data export failed. Check server connection.', 'error');
     }
   };
 
   const handleUnflagUser = async (userId: string) => {
     try {
       await adminAPI.unflagUser(userId);
+      showToast('User security flag cleared', 'info');
       fetchStats();
     } catch (err) {
-      alert('Failed to unflag user');
+      showToast('Failed to clear security flag', 'error');
     }
   };
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-      <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      <p className="text-text-muted font-bold tracking-widest uppercase text-xs">Loading Analytics...</p>
-    </div>
-  );
+  if (loading) return <DashboardSkeleton />;
 
   return (
     <div className="space-y-8 pb-12">
