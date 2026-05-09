@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { 
   Vote, ShieldCheck, BarChart3, BrainCircuit, Lock, 
-  ChevronRight, Users, Globe, Activity, Star
+  ChevronRight, Users, Globe, Activity, Star, Play
 } from 'lucide-react';
 
 interface LandingPageProps {
