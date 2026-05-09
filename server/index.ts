@@ -80,10 +80,17 @@ app.use(async (req, res, next) => {
 
 // ── Routes ────────────────────────────────────────
 app.get('/api/health', (req, res) => {
+  const uri = process.env.MONGODB_URI || '';
   res.json({
     success: true,
     message: 'ElectraGuide API is running.',
     dbStatus: isConnected ? 'Connected' : 'Disconnected',
+    diagnostics: {
+      hasUri: !!uri,
+      uriStart: uri.substring(0, 15) + '...', // Check if it starts with mongodb+srv
+      nodeEnv: process.env.NODE_ENV,
+      vercelEnv: process.env.VERCEL ? 'YES' : 'NO'
+    },
     timestamp: new Date().toISOString(),
     version: '1.0.0'
   });
