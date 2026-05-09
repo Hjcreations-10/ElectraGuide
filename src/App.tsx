@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Vote, LayoutDashboard, ShieldCheck, LogOut, 
-  Menu, X, Bell, User as UserIcon, Settings, BarChart2, History, Shield
+  Menu, X, Bell, User as UserIcon, Settings, BarChart2, History, Shield, Zap
 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import AuthPage from './pages/AuthPage';
