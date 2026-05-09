@@ -2,6 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+
+// Load env vars first thing
+dotenv.config();
+
 import rateLimit from 'express-rate-limit';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.js';
@@ -9,11 +13,9 @@ import votingRoutes from './routes/voting.js';
 import adminRoutes from './routes/admin.js';
 import aiRoutes from './routes/ai.js';
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/electraguide';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // ── Middleware ────────────────────────────────────
 app.use(cors({

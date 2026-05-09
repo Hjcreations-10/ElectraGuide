@@ -40,4 +40,4 @@ electionSchema.virtual('isActive').get(function() {
   return this.status === 'ongoing' && now >= this.startTime && now <= this.endTime;
 });
 
-export default mongoose.model('Election', electionSchema);
+export default mongoose.models.Election || mongoose.model('Election', electionSchema);

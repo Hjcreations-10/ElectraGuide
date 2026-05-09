@@ -43,4 +43,4 @@ voteSchema.statics.hashUserId = function(userId: string): string {
   return crypto.createHash('sha256').update(userId + process.env.VOTE_HASH_SECRET).digest('hex');
 };
 
-export default mongoose.model('Vote', voteSchema);
+export default mongoose.models.Vote || mongoose.model('Vote', voteSchema);
