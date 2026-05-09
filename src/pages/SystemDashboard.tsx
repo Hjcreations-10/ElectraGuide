@@ -314,16 +314,16 @@ const SystemDashboard: React.FC = () => {
                 let Icon = Activity;
                 let colorClass = 'text-text-muted bg-white/5';
                 
-                if (item.action.includes('Registered')) {
+                if (item.action?.includes('Registered')) {
                   Icon = UserPlus;
                   colorClass = 'text-primary bg-primary/10';
-                } else if (item.action.includes('Voted')) {
+                } else if (item.action?.includes('Voted')) {
                   Icon = CheckCircle2;
                   colorClass = 'text-success bg-success/10';
-                } else if (item.action.includes('Flagged')) {
+                } else if (item.action?.includes('Flagged')) {
                   Icon = AlertCircle;
                   colorClass = 'text-danger bg-danger/10';
-                } else if (item.action.includes('Election')) {
+                } else if (item.action?.includes('Election')) {
                   Icon = Award;
                   colorClass = 'text-accent bg-accent/10';
                 }
