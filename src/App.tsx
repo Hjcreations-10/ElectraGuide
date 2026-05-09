@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Vote, LayoutDashboard, ShieldCheck, LogOut, 
@@ -9,11 +9,17 @@ import AuthPage from './pages/AuthPage';
 import VoterDashboard from './pages/VoterDashboard';
 import SystemDashboard from './pages/SystemDashboard';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
+import LandingPage from './pages/LandingPage';
 
 const App: React.FC = () => {
   const { user, logout, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'system' | 'settings'>('dashboard');
+  const [currentView, setCurrentView] = useState<'landing' | 'auth' | 'app'>('landing');
+
+  useEffect(() => {
+    if (user) setCurrentView('app');
+  }, [user]);
 
   if (loading) {
     return (
@@ -29,9 +35,15 @@ const App: React.FC = () => {
     );
   }
 
-  if (!user) {
-    return <AuthPage />;
+  if (currentView === 'landing') {
+    return <LandingPage onEnterPortal={() => setCurrentView('auth')} />;
   }
+
+  if (currentView === 'auth' && !user) {
+    return <AuthPage onSuccess={() => setCurrentView('app')} />;
+  }
+
+  if (!user) return <AuthPage onSuccess={() => setCurrentView('app')} />;
 
   const menuItems = [
     { id: 'dashboard', label: 'Voter Hub', icon: LayoutDashboard, roles: ['voter', 'admin'], desc: 'Ballot & AI Insights' },

@@ -15,10 +15,26 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess }) => {
   const [error, setError] = useState('');
   const [form, setForm] = useState({ name: '', email: '', password: '', voterId: '' });
 
+  const [loadingStep, setLoadingStep] = useState(0);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    
+    // Simulate secure OTP/Biometric flow
+    const loadingMessages = [
+      "Establishing Secure Tunnel...",
+      "Verifying Biometric Hash...",
+      "Generating Session Keys...",
+      "Authorizing..."
+    ];
+    
+    for (let i = 0; i < loadingMessages.length; i++) {
+      setLoadingStep(i);
+      await new Promise(r => setTimeout(r, 600)); // 600ms per step
+    }
+
     try {
       if (isLogin) {
         await login(form.email, form.password);
@@ -31,6 +47,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess }) => {
       setError(err.response?.data?.message || err.message || 'Identity synchronization failed. Please verify credentials.');
     } finally {
       setLoading(false);
+      setLoadingStep(0);
     }
   };
 
@@ -160,7 +177,22 @@ const AuthPage: React.FC<AuthPageProps> = ({ onSuccess }) => {
               {loading ? (
                 <div className="flex items-center gap-3">
                    <Loader2 size={20} className="animate-spin" />
-                   <span className="animate-pulse">Authorizing...</span>
+                   <AnimatePresence mode="wait">
+                     <motion.span 
+                       key={loadingStep}
+                       initial={{ opacity: 0, y: 10 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       exit={{ opacity: 0, y: -10 }}
+                       className="font-mono text-xs"
+                     >
+                       {[
+                         "Establishing Secure Tunnel...",
+                         "Verifying Biometric Hash...",
+                         "Generating Session Keys...",
+                         "Authorizing..."
+                       ][loadingStep]}
+                     </motion.span>
+                   </AnimatePresence>
                 </div>
               ) : (
                 <span className="flex items-center justify-center gap-3">

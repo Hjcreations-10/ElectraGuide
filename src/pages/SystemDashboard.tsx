@@ -22,7 +22,7 @@ const SystemDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const fetchAllData = useCallback(async () => {
+  const fetchAllData = useCallback(async (isPolling = false) => {
     try {
       const [statsRes, feedRes] = await Promise.all([
         adminAPI.getStats(),
@@ -33,14 +33,22 @@ const SystemDashboard: React.FC = () => {
       if (feedRes.data?.success) setFeed(feedRes.data.feed);
     } catch (err: any) {
       console.error('Dashboard Sync Error:', err);
-      showToast('Failed to sync system data', 'error');
+      if (!isPolling) showToast('Failed to sync system data', 'error');
     } finally {
       setLoading(false);
     }
   }, [showToast]);
 
-  useEffect(() => { fetchAllData(); }, [fetchAllData]);
-
+  useEffect(() => { 
+    fetchAllData(); 
+    
+    // Simulate Real-time WebSocket connection using SSE/Polling
+    const interval = setInterval(() => {
+      fetchAllData(true);
+    }, 5000); // Poll every 5 seconds
+    
+    return () => clearInterval(interval);
+  }, [fetchAllData]);
   const handleExport = async () => {
     try {
       const response = await adminAPI.exportCSV();

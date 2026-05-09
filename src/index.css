@@ -251,5 +251,13 @@ tr:last-child td { border-bottom: none; }
   }
   .p-8 { padding: 1.25rem !important; }
   h2 { font-size: 1.5rem !important; }
+  
+  /* Landing Page specific */
+  .text-6xl, .text-8xl { font-size: 3rem !important; line-height: 1.1 !important; }
+  .space-y-40 > * + * { margin-top: 5rem !important; }
+  
+  /* Sidebar handling */
+  aside { transform: translateX(-100%); }
+  aside.is-open { transform: translateX(0); }
 }
 
