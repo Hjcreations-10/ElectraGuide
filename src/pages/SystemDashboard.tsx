@@ -5,7 +5,7 @@ import {
   Trash2, Play, Square, Loader2, AlertTriangle, CheckCircle2,
   TrendingUp, Clock, History, UserCheck, ShieldOff, Search,
   Filter, ChevronRight, Activity, Bell, Map, FileText, Settings,
-  Zap, BrainCircuit, Sparkles, UserPlus, Award
+  Zap, BrainCircuit, Sparkles, UserPlus, Award, ShieldCheck
 } from 'lucide-react';
 import { adminAPI } from '../services/api';
 import { 
