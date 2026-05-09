@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Vote, Mail, Lock, User, ShieldCheck, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { Vote, Mail, Lock, User, ShieldCheck, Eye, EyeOff, AlertCircle, Loader2, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface AuthPageProps {
