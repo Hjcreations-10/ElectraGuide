@@ -50,11 +50,40 @@ app.use((req, res, next) => {
   next();
 });
 
+
+// ── DB Connection Helper ──────────────────────────
+let isConnected = false;
+const connectDB = async () => {
+  if (isConnected) return;
+  try {
+    mongoose.set('bufferCommands', false); // Disable buffering for faster failure feedback
+    await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000,
+    });
+    isConnected = true;
+    console.log(`✅ MongoDB Atlas connected`);
+  } catch (error) {
+    console.error('❌ MongoDB connection failed:', error);
+    throw error;
+  }
+};
+
+// Middleware to ensure DB connection before every request
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(503).json({ success: false, message: 'Database connection failed. Please try again later.' });
+  }
+});
+
 // ── Routes ────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     message: 'ElectraGuide API is running.',
+    dbStatus: isConnected ? 'Connected' : 'Disconnected',
     timestamp: new Date().toISOString(),
     version: '1.0.0'
   });
@@ -68,29 +97,11 @@ app.use('/api/admin', adminRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-// ── DB + Start ────────────────────────────────────
-const startServer = async () => {
-  try {
-    await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000
-    });
-    console.log(`✅ MongoDB connected: ${MONGODB_URI.split('@').pop() || 'local'}`);
-    
-    // Only start the listener if we are running locally
-    if (process.env.NODE_ENV !== 'production') {
-      app.listen(PORT, () => {
-        console.log(`🚀 ElectraGuide server running on http://localhost:${PORT}`);
-        console.log(`📊 Admin CSV export: http://localhost:${PORT}/api/admin/export/csv`);
-      });
-    }
-  } catch (error) {
-    console.error('❌ MongoDB connection failed:', error);
-    if (process.env.NODE_ENV !== 'production') {
-      process.exit(1);
-    }
-  }
-};
-
-startServer();
+// ── Start Listener (only if not on Vercel) ─────────
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Local server running on http://localhost:${PORT}`);
+  });
+}
 
 export default app;
