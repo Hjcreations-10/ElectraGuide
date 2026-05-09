@@ -51,6 +51,20 @@ app.use((req, res, next) => {
 });
 
 
+// ── Emergency Diagnostic (Bypasses DB middleware) ───
+app.get('/api/emergency-check', (req, res) => {
+  const uri = process.env.MONGODB_URI || '';
+  res.json({
+    success: true,
+    message: 'System is alive. Checking variables...',
+    hasUri: !!uri,
+    uriLength: uri.length,
+    uriStart: uri.substring(0, 15) + '...',
+    nodeVersion: process.version,
+    env: process.env.NODE_ENV
+  });
+});
+
 // ── DB Connection Helper ──────────────────────────
 let isConnected = false;
 const connectDB = async () => {
