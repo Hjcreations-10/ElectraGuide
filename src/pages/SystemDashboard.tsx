@@ -5,12 +5,14 @@ import {
   Trash2, Play, Square, Loader2, AlertTriangle, CheckCircle2,
   TrendingUp, Clock, History, UserCheck, ShieldOff, Search,
   Filter, ChevronRight, Activity, Bell, Map, FileText, Settings,
-  Zap, BrainCircuit, Sparkles, UserPlus, Award, ShieldCheck
+  Zap, BrainCircuit, Sparkles, UserPlus, Award, ShieldCheck,
+  Calendar, Globe, Server, UserX, AlertCircle
 } from 'lucide-react';
 import { adminAPI } from '../services/api';
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
-  ResponsiveContainer, Cell, PieChart, Pie, AreaChart, Area
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
+  ResponsiveContainer, Cell, PieChart, Pie, AreaChart, Area,
+  LineChart, Line
 } from 'recharts';
 import { useToast } from '../context/ToastContext';
 import { DashboardSkeleton } from '../components/Skeleton';
@@ -20,7 +22,10 @@ const SystemDashboard: React.FC = () => {
   const [data, setData] = useState<any>(null);
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Interactive Filter States
+  const [filterRegion, setFilterRegion] = useState('All Regions');
+  const [filterDate, setFilterDate] = useState('Last 7 Days');
 
   const fetchAllData = useCallback(async (isPolling = false) => {
     try {
@@ -49,6 +54,7 @@ const SystemDashboard: React.FC = () => {
     
     return () => clearInterval(interval);
   }, [fetchAllData]);
+
   const handleExport = async () => {
     try {
       const response = await adminAPI.exportCSV();
@@ -64,313 +70,321 @@ const SystemDashboard: React.FC = () => {
     }
   };
 
-  if (loading) return <DashboardSkeleton />;
+  if (loading && !data) return <DashboardSkeleton />;
+  if (!data) return null;
+
+  const { stats, candidateVotes, hourlyData, dailyVotes, systemHealth, regionalData, insights, suspiciousActivity } = data;
+
+  const COLORS = ['#6366f1', '#a855f7', '#ec4899', '#14b8a6', '#f59e0b'];
 
   return (
-    <div className="space-y-10 pb-20">
-      {/* ─── 1. COMMAND CENTER HEADER ────────────────────────────── */}
-      <div className="glass p-10 border-l-[12px] border-l-primary relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:scale-110 transition-transform duration-700">
-           <Activity size={240} />
+    <div className="space-y-8 pb-20">
+      
+      {/* ─── 1. HEADER & INTERACTIVE FILTERS ────────────────────────────── */}
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-8">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <span className="badge badge-success flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              Live Sync
+            </span>
+            <span className="text-[10px] font-black text-text-faint uppercase tracking-[0.4em]">Node-Alpha-01</span>
+          </div>
+          <h2 className="text-3xl xl:text-4xl font-black italic uppercase tracking-tighter leading-none">
+            Intelligence <span className="text-primary">Command</span>
+          </h2>
         </div>
-        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 relative z-10">
-          <div className="flex items-center gap-6">
-            <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center text-primary border border-primary/20 shadow-2xl shadow-primary/20 animate-pulse-slow">
-              <Zap size={40} />
-            </div>
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                 <span className="badge badge-success">System Online</span>
-                 <span className="text-[10px] font-black text-text-faint uppercase tracking-[0.4em]">Node-Alpha-01</span>
+
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4 w-full xl:w-auto">
+          <div className="glass px-4 py-3 rounded-xl flex items-center gap-3 flex-1 xl:flex-none">
+            <Calendar size={16} className="text-primary" />
+            <select className="bg-transparent border-none text-sm font-bold text-text focus:outline-none w-full" value={filterDate} onChange={(e) => setFilterDate(e.target.value)}>
+              <option>Today</option>
+              <option>Last 7 Days</option>
+              <option>Last 30 Days</option>
+            </select>
+          </div>
+          <div className="glass px-4 py-3 rounded-xl flex items-center gap-3 flex-1 xl:flex-none">
+            <Globe size={16} className="text-primary" />
+            <select className="bg-transparent border-none text-sm font-bold text-text focus:outline-none w-full" value={filterRegion} onChange={(e) => setFilterRegion(e.target.value)}>
+              <option>All Regions</option>
+              <option>North Region</option>
+              <option>South Region</option>
+              <option>East Region</option>
+              <option>West Region</option>
+            </select>
+          </div>
+          <button onClick={handleExport} className="btn-primary py-3 px-6 shadow-xl shadow-primary/20 flex-1 xl:flex-none">
+            <Download size={16} /> Power BI Export
+          </button>
+        </div>
+      </div>
+
+      {/* ─── 2. TOP-LEVEL METRICS (6 CARDS) ────────────────────────────── */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+        <StatCard title="Total Votes" value={stats.votesCast.toLocaleString()} icon={<Vote />} color="primary" />
+        <StatCard title="Active Elections" value={stats.hasActiveElection ? '1' : '0'} icon={<Activity />} color="success" />
+        <StatCard title="Participation" value={`${stats.turnout}%`} icon={<TrendingUp />} color="accent" />
+        <StatCard title="Registered Voters" value={stats.totalUsers.toLocaleString()} icon={<Users />} color="primary" />
+        <StatCard title="Live Users" value={systemHealth?.activeUsers || 0} icon={<Globe />} color="warning" pulse />
+        <StatCard title="System Uptime" value={systemHealth?.uptime || '99.9%'} icon={<Server />} color="success" />
+      </div>
+
+      {/* ─── 3. AI INSIGHTS PANEL ────────────────────────────── */}
+      <div className="glass p-6 border-l-4 border-l-accent relative overflow-hidden group">
+        <div className="absolute top-0 right-0 p-6 opacity-[0.05] group-hover:scale-110 transition-transform duration-700">
+           <BrainCircuit size={100} />
+        </div>
+        <div className="flex items-center gap-3 mb-4">
+          <Sparkles className="text-accent" size={20} />
+          <h3 className="font-black italic uppercase tracking-widest text-sm">Neural Insights</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+          {(insights || [
+            { type: 'trend', text: 'Participation trending upwards by 5% this hour.' },
+            { type: 'warning', text: 'Awaiting data synchronization for region 4.' },
+            { type: 'info', text: 'System load is optimal. No bottlenecks detected.' }
+          ]).map((insight: any, i: number) => (
+            <div key={i} className="flex gap-3">
+              <div className={`mt-1 flex-shrink-0 ${insight.type === 'warning' ? 'text-warning' : insight.type === 'trend' ? 'text-success' : 'text-primary'}`}>
+                <ChevronRight size={16} />
               </div>
-              <h2 className="text-4xl font-black italic uppercase tracking-tighter leading-none mb-2">
-                Intelligence <span className="text-primary">Command</span>
-              </h2>
-              <p className="text-xs font-bold text-text-muted max-w-md">Real-time election oversight and security monitoring interface. All data nodes are synchronized with 256-bit encryption.</p>
+              <p className="text-sm font-medium text-text-muted">{insight.text}</p>
             </div>
-          </div>
-          
-          <div className="flex flex-wrap gap-4 w-full xl:w-auto">
-             <button onClick={handleExport} className="btn-ghost flex-1 xl:flex-none py-4 px-8 border-primary/20 text-primary hover:bg-primary/5">
-                <Download size={18} /> Power BI Dataset
-             </button>
-             <button className="btn-primary flex-1 xl:flex-none py-4 px-10 shadow-2xl">
-                <Plus size={18} /> Create Election
-             </button>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* ─── 2. CRITICAL METRICS ─────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <MetricCard label="Total Voters" value={data?.stats?.totalUsers} icon={<Users size={24} />} color="indigo" trend="+4% this week" />
-        <MetricCard label="Votes Secured" value={data?.stats?.votesCast} icon={<ShieldCheck size={24} />} color="emerald" trend="Live Sync" />
-        <MetricCard label="Global Turnout" value={`${data?.stats?.turnout}%`} icon={<TrendingUp size={24} />} color="amber" progress={data?.stats?.turnout} />
-        <MetricCard label="Risk Anomalies" value={data?.stats?.flaggedUsers} icon={<ShieldAlert size={24} />} color="rose" trend="Immediate Attention" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      {/* ─── 4. ADVANCED VISUALIZATIONS GRID ────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* ─── 3. ANALYTICS HUB ────────────────────────────────────── */}
-        <div className="lg:col-span-2 space-y-10">
+        {/* A. Area Chart: Voting Activity Over Time */}
+        <div className="glass p-6 col-span-1 lg:col-span-2">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-black uppercase tracking-widest">Voting Trajectory</h3>
+            <span className="badge badge-primary">Last 7 Days</span>
+          </div>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={dailyVotes}>
+                <defs>
+                  <linearGradient id="colorVotes" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                <XAxis dataKey="date" stroke="#ffffff50" fontSize={12} tickMargin={10} />
+                <YAxis stroke="#ffffff50" fontSize={12} tickFormatter={(val) => val >= 1000 ? `${(val/1000).toFixed(1)}k` : val} />
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: '#05070a', borderColor: '#ffffff20', borderRadius: '12px' }}
+                  itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                />
+                <Area type="monotone" dataKey="votes" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorVotes)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* B. Pie/Donut Chart: Demographic / Regional Distribution */}
+        <div className="glass p-6 flex flex-col">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-black uppercase tracking-widest">Regional Turnout</h3>
+          </div>
+          <div className="h-[250px] w-full flex-1">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={regionalData || [{name: 'No Data', votes: 1}]}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={5}
+                  dataKey="votes"
+                >
+                  {(regionalData || [{}]).map((_: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: '#05070a', borderColor: '#ffffff20', borderRadius: '12px' }}
+                  itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Legend */}
+          <div className="flex flex-wrap justify-center gap-4 mt-4">
+            {(regionalData || []).map((r: any, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-xs font-bold text-text-muted">
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                {r.name} ({r.votes})
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* C. Bar Chart: Candidate Vote Share */}
+        <div className="glass p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-black uppercase tracking-widest">Candidate Performance</h3>
+          </div>
+          <div className="h-[250px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={candidateVotes} layout="vertical" margin={{ left: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" horizontal={true} vertical={false} />
+                <XAxis type="number" stroke="#ffffff50" fontSize={12} />
+                <YAxis dataKey="name" type="category" stroke="#ffffff50" fontSize={12} width={100} />
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: '#05070a', borderColor: '#ffffff20', borderRadius: '12px' }}
+                  cursor={{ fill: '#ffffff05' }}
+                />
+                <Bar dataKey="voteCount" radius={[0, 4, 4, 0]} barSize={20}>
+                  {candidateVotes.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+      </div>
+
+      {/* ─── 5. ADMIN MONITORING & ACTIVITY FEED ────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* System Health / Suspicious Activity */}
+        <div className="glass p-6 lg:col-span-1 space-y-6">
+          <h3 className="text-lg font-black uppercase tracking-widest flex items-center gap-3">
+            <ShieldAlert className="text-warning" /> Security Node
+          </h3>
           
-          {/* Active Election Widget */}
-          <div className="glass p-10 border-t border-white/5 relative overflow-hidden">
-             <div className="flex flex-col md:flex-row justify-between items-center gap-10">
-                <div className="flex-1 space-y-6">
-                   <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                      <span className="text-[10px] font-black text-success uppercase tracking-widest">Ongoing Election Stream</span>
-                   </div>
-                   <h3 className="text-5xl font-black italic uppercase tracking-tighter leading-tight">
-                     {data?.stats?.election?.title || 'Electoral Window Active'}
-                   </h3>
-                   <div className="flex gap-8">
-                      <div className="space-y-1">
-                         <p className="text-[9px] font-black text-text-faint uppercase tracking-widest">Participation</p>
-                         <p className="text-xl font-black text-text italic">{data?.stats?.turnout || 0}%</p>
-                      </div>
-                      <div className="space-y-1">
-                         <p className="text-[9px] font-black text-text-faint uppercase tracking-widest">Node Status</p>
-                         <p className="text-xl font-black text-success italic">STABLE</p>
-                      </div>
-                   </div>
-                </div>
+          <div className="space-y-4">
+            <div className="bg-black/20 p-4 rounded-xl border border-white/5 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-text-faint font-bold uppercase">Threat Level</p>
+                <p className={`font-black text-lg ${systemHealth?.threatLevel === 'Elevated' ? 'text-warning' : 'text-success'}`}>
+                  {systemHealth?.threatLevel || 'Low'}
+                </p>
+              </div>
+              <Activity className={systemHealth?.threatLevel === 'Elevated' ? 'text-warning' : 'text-success'} />
+            </div>
+
+            <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+               <p className="text-xs text-text-faint font-bold uppercase mb-3">Flagged Nodes</p>
+               {suspiciousActivity && suspiciousActivity.length > 0 ? (
+                 <div className="space-y-3">
+                   {suspiciousActivity.slice(0,3).map((user: any) => (
+                     <div key={user._id} className="flex items-center justify-between">
+                       <span className="text-sm font-medium">{user.voterId}</span>
+                       <span className="badge badge-warning text-[9px] px-2 py-0.5">Review</span>
+                     </div>
+                   ))}
+                 </div>
+               ) : (
+                 <p className="text-sm text-text-muted">No suspicious activity detected.</p>
+               )}
+            </div>
+            
+            <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+              <p className="text-xs text-text-faint font-bold uppercase mb-2">Server Load</p>
+              <div className="w-full bg-white/5 rounded-full h-2">
+                <div className="bg-primary h-2 rounded-full transition-all duration-1000" style={{ width: systemHealth?.currentLoad || '20%' }} />
+              </div>
+              <p className="text-right text-xs mt-1 text-text-muted">{systemHealth?.currentLoad || '20%'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Activity Feed */}
+        <div className="glass p-6 lg:col-span-2 flex flex-col">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-black uppercase tracking-widest">Global Action Ledger</h3>
+            <span className="text-xs font-bold text-text-muted flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-success animate-pulse" /> Live Sync
+            </span>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto pr-4 space-y-4 max-h-[400px] custom-scrollbar">
+            <AnimatePresence initial={false}>
+              {feed.map((item, index) => {
+                let Icon = Activity;
+                let colorClass = 'text-text-muted bg-white/5';
                 
-                <div className="w-full md:w-auto text-center md:text-right space-y-4 bg-black/20 p-8 rounded-[2.5rem] border border-white/5">
-                   <p className="text-[10px] font-black text-text-faint uppercase tracking-[0.2em]">Ballot Window Closes In</p>
-                   <div className="text-5xl font-black italic text-warning tracking-tighter tabular-nums drop-shadow-lg">04:22:15</div>
-                   <div className="progress-bar h-2 w-full mt-6">
-                      <div className="progress-fill bg-warning" style={{ width: '68%' }} />
-                   </div>
-                </div>
-             </div>
-          </div>
+                if (item.action.includes('Registered')) {
+                  Icon = UserPlus;
+                  colorClass = 'text-primary bg-primary/10';
+                } else if (item.action.includes('Voted')) {
+                  Icon = CheckCircle2;
+                  colorClass = 'text-success bg-success/10';
+                } else if (item.action.includes('Flagged')) {
+                  Icon = AlertCircle;
+                  colorClass = 'text-danger bg-danger/10';
+                } else if (item.action.includes('Election')) {
+                  Icon = Award;
+                  colorClass = 'text-accent bg-accent/10';
+                }
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-             {/* Live Ranking */}
-             <div className="glass p-10">
-                <div className="flex justify-between items-center mb-10">
-                   <h4 className="text-sm font-black uppercase tracking-[0.2em] text-primary italic">Live Candidate Delta</h4>
-                   <div className="bg-primary/10 p-2 rounded-lg text-primary"><BarChart3 size={18} /></div>
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    className="flex items-start gap-4 p-4 rounded-xl bg-black/20 border border-white/5 hover:border-white/10 transition-colors group"
+                  >
+                    <div className={`p-3 rounded-xl ${colorClass}`}>
+                      <Icon size={18} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <p className="text-sm font-bold text-text truncate pr-4">{item.user}</p>
+                        <span className="text-[10px] font-mono text-text-faint whitespace-nowrap">
+                          {new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}
+                        </span>
+                      </div>
+                      <p className="text-xs text-text-muted truncate group-hover:text-text-faint transition-colors">{item.action}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+              
+              {feed.length === 0 && (
+                <div className="text-center py-10 text-text-muted flex flex-col items-center">
+                  <History size={40} className="mb-4 opacity-20" />
+                  <p>Awaiting ledger entries...</p>
                 </div>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data?.candidateVotes}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#475569', fontSize: 10, fontWeight: 700}} />
-                      <Tooltip 
-                        cursor={{fill: 'rgba(255,255,255,0.02)'}}
-                        contentStyle={{ background: '#0b0f1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }} 
-                      />
-                      <Bar dataKey="voteCount" radius={[8, 8, 0, 0]} barSize={40}>
-                        {data?.candidateVotes?.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-             </div>
-
-             {/* Voting Velocity */}
-             <div className="glass p-10">
-                <div className="flex justify-between items-center mb-10">
-                   <h4 className="text-sm font-black uppercase tracking-[0.2em] text-accent italic">Voting Velocity</h4>
-                   <div className="bg-accent/10 p-2 rounded-lg text-accent"><TrendingUp size={18} /></div>
-                </div>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data?.hourlyData}>
-                      <defs>
-                        <linearGradient id="colorVotes" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#f97316" stopOpacity={0.4}/>
-                          <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
-                      <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{fill: '#475569', fontSize: 10, fontWeight: 700}} />
-                      <Tooltip contentStyle={{ background: '#0b0f1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px' }} />
-                      <Area type="monotone" dataKey="votes" stroke="#f97316" fillOpacity={1} fill="url(#colorVotes)" strokeWidth={4} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-             </div>
-          </div>
-
-          {/* ─── 4. CANDIDATE MANAGEMENT ─────────────────────────────── */}
-          <div className="glass overflow-hidden">
-             <div className="p-10 border-b border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-                <div>
-                  <h4 className="text-2xl font-black italic uppercase tracking-tight mb-1">Ballot Registry</h4>
-                  <p className="text-[10px] font-black text-text-faint uppercase tracking-widest">Management of official electoral nodes</p>
-                </div>
-                <div className="relative w-full md:w-80">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-faint" size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Filter records..." 
-                    className="input pl-12 py-3 text-xs" 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-             </div>
-
-             <div className="table-container border-none rounded-none">
-                <table className="w-full">
-                   <thead>
-                      <tr>
-                         <th>Identity</th>
-                         <th>Electoral Party</th>
-                         <th>Regionality</th>
-                         <th>Ballot Weight</th>
-                         <th className="text-right">Actions</th>
-                      </tr>
-                   </thead>
-                   <tbody>
-                      {data?.candidateVotes?.filter((c: any) => c.name.toLowerCase().includes(searchTerm.toLowerCase())).map((cand: any) => (
-                        <tr key={cand._id} className="group transition-all">
-                           <td>
-                              <div className="flex items-center gap-4">
-                                 <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center font-black text-text-muted border border-white/5 group-hover:border-primary/40 group-hover:text-primary transition-all">
-                                    {cand.name[0]}
-                                 </div>
-                                 <span className="font-bold text-sm tracking-tight">{cand.name}</span>
-                              </div>
-                           </td>
-                           <td>
-                             <div className="flex items-center gap-2">
-                               <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: cand.color }} />
-                               <span className="text-[10px] font-black uppercase tracking-widest">{cand.party}</span>
-                             </div>
-                           </td>
-                           <td><span className="badge bg-white/5 text-text-faint italic border-none lowercase">national_stream</span></td>
-                           <td className="font-mono font-black text-primary text-lg">{cand.voteCount}</td>
-                           <td className="text-right">
-                              <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
-                                 <button className="p-2.5 hover:bg-success/10 text-success rounded-xl transition-colors"><UserCheck size={18}/></button>
-                                 <button className="p-2.5 hover:bg-rose-500/10 text-rose-500 rounded-xl transition-colors"><Trash2 size={18}/></button>
-                              </div>
-                           </td>
-                        </tr>
-                      ))}
-                   </tbody>
-                </table>
-             </div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* ─── 5. INTELLIGENCE FEED & SECURITY ─────────────────────── */}
-        <div className="space-y-10">
-           
-           {/* AI Insight Widget */}
-           <div className="glass p-8 border-t-8 border-t-indigo-500 bg-indigo-500/5">
-              <div className="flex items-center gap-4 mb-8">
-                 <div className="bg-indigo-500 p-3 rounded-2xl text-white shadow-xl shadow-indigo-500/30 animate-pulse">
-                    <BrainCircuit size={28} />
-                 </div>
-                 <div>
-                    <h4 className="text-sm font-black italic uppercase tracking-tight text-indigo-400">AI Neural Engine</h4>
-                    <p className="text-[9px] font-black uppercase text-text-faint tracking-widest">Predictive Logic Cluster</p>
-                 </div>
-              </div>
-              <div className="space-y-4">
-                 {[
-                   { text: "Proprietary vote-share prediction: Candidate B leading by 4.2%", type: 'prediction' },
-                   { text: "System anomaly detected: Multiple voter collisions in sector-09", type: 'alert' },
-                   { text: "Efficiency insight: High voting throughput detected in urban hubs", type: 'insight' }
-                 ].map((insight, i) => (
-                   <div key={i} className="p-5 bg-black/40 rounded-3xl border border-white/5 hover:border-indigo-500/40 transition-all group cursor-pointer">
-                      <div className="flex gap-4">
-                        <div className="mt-1">
-                          {insight.type === 'alert' ? <AlertTriangle size={16} className="text-rose-400" /> : <Sparkles size={16} className="text-indigo-400" />}
-                        </div>
-                        <p className="text-xs text-text-muted leading-relaxed font-medium group-hover:text-text transition-colors italic">"{insight.text}"</p>
-                      </div>
-                   </div>
-                 ))}
-              </div>
-              <button className="w-full mt-8 py-4 bg-indigo-600/10 text-indigo-400 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border border-indigo-500/20 hover:bg-indigo-600/20 transition-all">
-                 Initialize Neural Sweep
-              </button>
-           </div>
-
-           {/* System Heartbeat */}
-           <div className="glass p-8">
-              <div className="flex justify-between items-center mb-8">
-                 <h4 className="text-sm font-black italic uppercase tracking-tight">System Heartbeat</h4>
-                 <Activity size={18} className="text-success animate-pulse" />
-              </div>
-              <div className="space-y-8 relative">
-                 <div className="absolute left-[19px] top-2 bottom-2 w-px bg-white/5" />
-                 {feed.length > 0 ? feed.map((item, i) => (
-                   <div key={i} className="flex gap-6 relative group">
-                      <div className="w-10 h-10 rounded-2xl bg-[#05070a] border border-white/10 flex items-center justify-center shrink-0 z-10 group-hover:border-primary/40 transition-colors">
-                         {item.icon === 'Vote' ? <VoteIcon size={16} className="text-success" /> : 
-                          item.icon === 'UserPlus' ? <UserPlus size={16} className="text-primary" /> : 
-                          <Award size={16} className="text-accent" />}
-                      </div>
-                      <div>
-                         <p className="text-xs font-black italic text-text leading-none mb-1">{item.title}</p>
-                         <p className="text-[10px] text-text-muted leading-relaxed mb-2">{item.description}</p>
-                         <p className="text-[9px] text-text-faint font-bold uppercase tracking-widest">{new Date(item.timestamp).toLocaleTimeString()}</p>
-                      </div>
-                   </div>
-                 )) : (
-                   <p className="text-[10px] text-text-faint italic text-center py-4">No recent activity logged</p>
-                 )}
-              </div>
-           </div>
-
-           {/* Security Perimeter */}
-           <div className="glass p-8 border-l-8 border-l-rose-600">
-              <div className="flex items-center gap-4 mb-6">
-                 <ShieldAlert size={24} className="text-rose-600" />
-                 <h4 className="text-sm font-black italic uppercase tracking-tight text-rose-600">Perimeter Breach Log</h4>
-              </div>
-              <div className="space-y-3">
-                 <div className="flex justify-between items-center p-4 bg-rose-600/10 rounded-[1.5rem] border border-rose-600/20 group hover:bg-rose-600/20 transition-all cursor-crosshair">
-                    <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Unauthorized Access Blocked</span>
-                    <span className="text-[10px] font-black tabular-nums text-rose-600/50">2m ago</span>
-                 </div>
-                 <div className="flex justify-between items-center p-4 bg-white/5 rounded-[1.5rem] border border-white/5 opacity-40 grayscale group hover:grayscale-0 transition-all">
-                    <span className="text-[10px] font-black text-text-faint uppercase tracking-widest group-hover:text-text-muted">Injection Attempt Nullified</span>
-                    <span className="text-[10px] font-black tabular-nums text-text-faint">1h ago</span>
-                 </div>
-              </div>
-           </div>
-        </div>
       </div>
     </div>
   );
 };
 
-const MetricCard: React.FC<{ label: string; value: any; icon: any; color: string; trend?: string; progress?: number }> = ({ label, value, icon, color, trend, progress }) => {
+const StatCard = ({ title, value, icon, color, pulse }: any) => {
   const colorMap: any = {
-    indigo: 'border-l-indigo-500 text-indigo-400 bg-indigo-500/5 hover:border-indigo-500/50',
-    emerald: 'border-l-emerald-500 text-emerald-400 bg-emerald-500/5 hover:border-emerald-500/50',
-    amber: 'border-l-amber-500 text-amber-400 bg-amber-500/5 hover:border-amber-500/50',
-    rose: 'border-l-rose-500 text-rose-400 bg-rose-500/5 hover:border-rose-500/50'
+    primary: 'text-primary bg-primary/10 border-primary/20',
+    accent: 'text-accent bg-accent/10 border-accent/20',
+    success: 'text-success bg-success/10 border-success/20',
+    warning: 'text-warning bg-warning/10 border-warning/20',
   };
 
   return (
-    <motion.div 
-      whileHover={{ y: -8, scale: 1.02 }} 
-      className={`p-10 rounded-[2.5rem] glass border-l-[6px] ${colorMap[color]} transition-all duration-500`}
-    >
-      <div className="flex justify-between items-start mb-6">
-        <div className="p-3 bg-white/5 rounded-2xl shadow-inner">{icon}</div>
-        {trend && <span className="text-[9px] font-black uppercase bg-white/10 px-3 py-1.5 rounded-full italic tracking-widest">{trend}</span>}
+    <div className="glass p-5 flex flex-col justify-between relative overflow-hidden group hover:-translate-y-1 transition-transform">
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${colorMap[color]} ${pulse ? 'animate-pulse' : ''}`}>
+        {icon}
       </div>
-      <p className="text-4xl font-black italic tabular-nums tracking-tighter mb-2 leading-none">{value || '0'}</p>
-      <p className="text-[10px] font-black uppercase text-text-faint tracking-[0.2em]">{label}</p>
-      {progress !== undefined && (
-        <div className="progress-bar h-1.5 mt-6">
-          <div className="progress-fill" style={{ width: `${progress}%`, backgroundColor: 'currentColor' }} />
-        </div>
-      )}
-    </motion.div>
+      <div>
+        <h4 className="text-[10px] font-black uppercase text-text-faint tracking-widest mb-1">{title}</h4>
+        <p className="text-2xl font-black">{value}</p>
+      </div>
+    </div>
   );
 };
 

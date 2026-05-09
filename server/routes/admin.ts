@@ -67,6 +67,27 @@ router.get('/stats', async (req: AuthRequest, res: Response): Promise<void> => {
       { $project: { date: '$_id', registrations: '$count', _id: 0 } }
     ]);
 
+    // Mock Advanced Analytics Data for Enterprise Dashboard
+    const systemHealth = {
+      uptime: '99.99%',
+      activeUsers: Math.floor(Math.random() * 500) + 1500, // Simulated 1500-2000 active users
+      currentLoad: '42%',
+      threatLevel: flaggedUsers > 5 ? 'Elevated' : 'Low'
+    };
+
+    const regionalData = [
+      { name: 'North Region', votes: Math.floor(votesCast * 0.35) || 350 },
+      { name: 'South Region', votes: Math.floor(votesCast * 0.25) || 250 },
+      { name: 'East Region', votes: Math.floor(votesCast * 0.20) || 200 },
+      { name: 'West Region', votes: Math.floor(votesCast * 0.20) || 200 }
+    ];
+
+    const insights = [
+      { type: 'trend', text: 'Candidate A gained 12% momentum in the last 4 hours.' },
+      { type: 'warning', text: 'Unusual voting spike detected from Node-Beta (South Region).' },
+      { type: 'info', text: 'Peak voting time consistently tracking between 6PM and 8PM.' }
+    ];
+
     res.json({
       success: true,
       stats: {
@@ -82,7 +103,10 @@ router.get('/stats', async (req: AuthRequest, res: Response): Promise<void> => {
       hourlyData,
       dailyVotes,
       registrationTrend,
-      suspiciousActivity
+      suspiciousActivity,
+      systemHealth,
+      regionalData,
+      insights
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
