@@ -13,7 +13,11 @@ import {
 import { useToast } from '../context/ToastContext';
 import { DashboardSkeleton } from '../components/Skeleton';
 
-const AdminDashboard: React.FC = () => {
+interface AdminDashboardProps {
+  onSwitchTab?: (tab: 'dashboard' | 'admin' | 'analytics' | 'settings') => void;
+}
+
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ onSwitchTab }) => {
   const { showToast } = useToast();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -126,6 +130,12 @@ const AdminDashboard: React.FC = () => {
               <Square className="w-4 h-4 fill-current" /> End Election
             </button>
           )}
+          <button 
+            onClick={() => onSwitchTab?.('analytics')} 
+            className="btn-accent border-2 border-indigo-900/20 bg-indigo-900/10 text-indigo-400 group"
+          >
+            <BarChart2 className="w-4 h-4 group-hover:rotate-12 transition-transform" /> Intelligence Hub
+          </button>
           <button onClick={() => setShowAddCandidate(true)} className="btn-primary">
             <Plus className="w-4 h-4" /> Add Candidate
           </button>

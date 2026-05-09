@@ -135,7 +135,7 @@ const App: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               {activeTab === 'dashboard' && <VoterDashboard />}
-              {activeTab === 'admin' && user.role === 'admin' && <AdminDashboard />}
+              {activeTab === 'admin' && user.role === 'admin' && <AdminDashboard onSwitchTab={setActiveTab} />}
               {activeTab === 'analytics' && user.role === 'admin' && <AnalyticsDashboard />}
               {activeTab === 'settings' && (
                 <div className="glass p-12 text-center space-y-6">
