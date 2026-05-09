@@ -84,6 +84,7 @@ app.get('/api/health', (req, res) => {
     success: true,
     message: 'ElectraGuide API is running.',
     dbStatus: isConnected ? 'Connected' : 'Disconnected',
+    envDetected: process.env.MONGODB_URI ? (process.env.MONGODB_URI.startsWith('mongodb') ? 'YES' : 'MALFORMED') : 'NO',
     timestamp: new Date().toISOString(),
     version: '1.0.0'
   });
