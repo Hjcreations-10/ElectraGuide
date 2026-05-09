@@ -7,13 +7,13 @@ import {
 import { useAuth } from './context/AuthContext';
 import AuthPage from './pages/AuthPage';
 import VoterDashboard from './pages/VoterDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+import SystemDashboard from './pages/SystemDashboard';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 
 const App: React.FC = () => {
   const { user, logout, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'admin' | 'analytics' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'system' | 'settings'>('dashboard');
 
   if (loading) {
     return (
@@ -35,8 +35,7 @@ const App: React.FC = () => {
 
   const menuItems = [
     { id: 'dashboard', label: 'Voter Hub', icon: LayoutDashboard, roles: ['voter', 'admin'] },
-    { id: 'admin', label: 'Admin Hub', icon: ShieldCheck, roles: ['admin'] },
-    { id: 'analytics', label: 'Intelligence', icon: BarChart2, roles: ['admin'] },
+    { id: 'system', label: 'System Control', icon: Zap, roles: ['admin'] },
     { id: 'settings', label: 'Security', icon: Settings, roles: ['voter', 'admin'] },
   ];
 
@@ -146,8 +145,7 @@ const App: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               {activeTab === 'dashboard' && <VoterDashboard />}
-              {activeTab === 'admin' && user.role === 'admin' && <AdminDashboard onSwitchTab={setActiveTab} />}
-              {activeTab === 'analytics' && user.role === 'admin' && <AnalyticsDashboard />}
+              {activeTab === 'system' && user.role === 'admin' && <SystemDashboard />}
               {activeTab === 'settings' && (
                 <div className="glass p-12 text-center space-y-6">
                   <div className="w-20 h-20 bg-success/10 text-success rounded-3xl flex items-center justify-center mx-auto">

@@ -346,4 +346,52 @@ router.get('/fraud-report', async (req: AuthRequest, res: Response): Promise<voi
   }
 });
 
+// ====================================================
+// GET /api/admin/activity-feed
+// ====================================================
+router.get('/activity-feed', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const recentVotes = await Vote.find()
+      .populate('candidateId', 'name')
+      .sort({ timestamp: -1 })
+      .limit(5);
+
+    const recentUsers = await User.find({ role: 'voter' })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    const recentCandidates = await Candidate.find()
+      .sort({ createdAt: -1 })
+      .limit(3);
+
+    const feed = [
+      ...recentVotes.map(v => ({
+        type: 'vote',
+        title: 'Vote Cast Successfully',
+        description: `A citizen securely voted for ${(v as any).candidateId?.name || 'a candidate'}.`,
+        timestamp: v.timestamp,
+        icon: 'Vote'
+      })),
+      ...recentUsers.map(u => ({
+        type: 'voter',
+        title: 'New Voter Registered',
+        description: `Citizen ${u.name} (ID: ${u.voterId}) joined the platform.`,
+        timestamp: u.createdAt,
+        icon: 'UserPlus'
+      })),
+      ...recentCandidates.map(c => ({
+        type: 'candidate',
+        title: 'Candidate Profile Live',
+        description: `${c.name} (${c.party}) is now on the official ballot.`,
+        timestamp: (c as any).createdAt,
+        icon: 'Award'
+      }))
+    ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    res.json({ success: true, feed: feed.slice(0, 10) });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 export default router;

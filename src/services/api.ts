@@ -62,7 +62,8 @@ export const adminAPI = {
   getUsers: () => api.get('/admin/users'),
   unflagUser: (id: string) => api.post(`/admin/users/${id}/unflag`),
   getFraudReport: () => api.get('/admin/fraud-report'),
-  exportCSV: () => api.get('/admin/export/csv', { responseType: 'blob' })
+  exportCSV: () => api.get('/admin/export/csv', { responseType: 'blob' }),
+  getActivityFeed: () => api.get('/admin/activity-feed')
 };
 
 // ─── AI Intelligence ────────────────────────────────────
