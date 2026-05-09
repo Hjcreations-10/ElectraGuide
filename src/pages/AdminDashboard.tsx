@@ -133,36 +133,47 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Power BI Intelligence Engine */}
-      <div className="glass p-8 border-l-4 border-l-accent relative overflow-hidden">
-        <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }}>
+      <div className="glass p-8 border-l-4 border-l-accent relative overflow-hidden group">
+        <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05 }} className="group-hover:scale-110 transition-transform duration-500">
           <BarChart3 size={200} />
         </div>
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
           <div className="flex-1">
-            <h3 className="text-xl font-black italic uppercase tracking-tight mb-2 flex items-center gap-2">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+              </div>
+              <span className="text-[10px] font-black uppercase text-accent tracking-[0.2em]">Live Data Engine Active</span>
+            </div>
+            <h3 className="text-2xl font-black italic uppercase tracking-tight mb-3 flex items-center gap-2">
               <BarChart3 className="text-accent" /> Power BI Analytics Sync
             </h3>
             <p className="text-text-muted text-sm leading-relaxed max-w-2xl">
-              Our proprietary **BI Engine** maps real-time voting patterns to detect fraud, predict turnout, and analyze candidate share. Export the structured dataset to Microsoft Power BI for deeper forensic analysis.
+              Our proprietary **BI Engine** maps real-time voting patterns to detect fraud, predict turnout, and analyze candidate share. This interface is optimized for **direct Power BI integration** via automated REST hooks and CSV forensic exports.
             </p>
             <div className="flex flex-wrap gap-4 mt-6">
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-text-faint tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" /> Behavioral Trends
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-text-faint tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5 backdrop-blur-sm">
+                <div className="w-1.5 h-1.5 bg-success rounded-full" /> Behavioral Trends
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-text-faint tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" /> Demographic Share
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-text-faint tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5 backdrop-blur-sm">
+                <div className="w-1.5 h-1.5 bg-success rounded-full" /> Demographic Share
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-text-faint tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
-                <div className="w-1.5 h-1.5 bg-danger rounded-full" /> Fraud Anomaly Map
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-text-faint tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5 backdrop-blur-sm">
+                <div className="w-1.5 h-1.5 bg-danger rounded-full animate-pulse" /> Fraud Anomaly Map
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-3 shrink-0">
-            <button onClick={handleExportCSV} className="btn-accent px-10 py-5 shadow-2xl shadow-accent/40 animate-bounce-subtle">
-              <Download className="w-6 h-6" /> Export Power BI Dataset
+            <button onClick={handleExportCSV} className="btn-accent px-10 py-5 shadow-2xl shadow-accent/40 hover:shadow-accent/60 transition-all hover:-translate-y-1 active:translate-y-0 group">
+              <Download className="w-6 h-6 group-hover:animate-bounce" /> 
+              <span className="ml-2">Export Power BI Dataset</span>
             </button>
-            <p className="text-[10px] text-center text-text-faint font-bold italic">Latest Sync: {new Date().toLocaleTimeString()}</p>
+            <div className="flex items-center justify-center gap-2">
+              <Clock className="w-3 h-3 text-text-faint" />
+              <p className="text-[10px] text-center text-text-faint font-bold italic uppercase tracking-widest">Auto-Syncing: every 60s</p>
+            </div>
           </div>
         </div>
       </div>
