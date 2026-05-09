@@ -65,4 +65,10 @@ export const adminAPI = {
   exportCSV: () => api.get('/admin/export/csv', { responseType: 'blob' })
 };
 
+// ─── AI Intelligence ────────────────────────────────────
+export const aiAPI = {
+  summarize: (candidateId: string) => api.post('/ai/summarize', { candidateId }),
+  compare: (candidateIds: string[]) => api.post('/ai/compare', { candidateIds })
+};
+
 export default api;

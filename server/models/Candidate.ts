@@ -23,6 +23,26 @@ const candidateSchema = new mongoose.Schema({
     type: String,
     default: '#6366f1'
   },
+  photo: {
+    type: String,
+    default: 'https://cdn-icons-png.flaticon.com/512/1077/1077114.png'
+  },
+  manifesto: {
+    type: String,
+    default: 'A commitment to progress, equality, and digital transparency for all citizens.'
+  },
+  experience: {
+    type: String,
+    default: 'Over 10 years of public service and community leadership.'
+  },
+  state: {
+    type: String,
+    default: 'National'
+  },
+  constituency: {
+    type: String,
+    default: 'General'
+  },
   voteCount: {
     type: Number,
     default: 0

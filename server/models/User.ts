@@ -31,8 +31,18 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['voter', 'admin'],
+    enum: ['voter', 'admin', 'candidate'],
     default: 'voter'
+  },
+  state: {
+    type: String,
+    trim: true,
+    default: 'National'
+  },
+  constituency: {
+    type: String,
+    trim: true,
+    default: 'General'
   },
   hasVoted: {
     type: Boolean,
