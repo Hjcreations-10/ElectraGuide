@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Vote, LayoutDashboard, ShieldCheck, LogOut, 
-  Menu, X, Bell, User as UserIcon, Settings
+  Menu, X, Bell, User as UserIcon, Settings, BarChart2, History, Shield
 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import AuthPage from './pages/AuthPage';
 import VoterDashboard from './pages/VoterDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
 
 const App: React.FC = () => {
   const { user, logout, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'admin' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'admin' | 'analytics' | 'settings'>('dashboard');
 
   if (loading) {
     return (
@@ -34,7 +35,8 @@ const App: React.FC = () => {
 
   const menuItems = [
     { id: 'dashboard', label: 'Voter Hub', icon: LayoutDashboard, roles: ['voter', 'admin'] },
-    { id: 'admin', label: 'Intelligence', icon: ShieldCheck, roles: ['admin'] },
+    { id: 'admin', label: 'Admin Hub', icon: ShieldCheck, roles: ['admin'] },
+    { id: 'analytics', label: 'Intelligence', icon: BarChart2, roles: ['admin'] },
     { id: 'settings', label: 'Security', icon: Settings, roles: ['voter', 'admin'] },
   ];
 
@@ -134,6 +136,7 @@ const App: React.FC = () => {
             >
               {activeTab === 'dashboard' && <VoterDashboard />}
               {activeTab === 'admin' && user.role === 'admin' && <AdminDashboard />}
+              {activeTab === 'analytics' && user.role === 'admin' && <AnalyticsDashboard />}
               {activeTab === 'settings' && (
                 <div className="glass p-12 text-center space-y-6">
                   <div className="w-20 h-20 bg-success/10 text-success rounded-3xl flex items-center justify-center mx-auto">
