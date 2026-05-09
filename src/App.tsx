@@ -62,18 +62,29 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        <nav className="flex-1 px-4 py-8 space-y-2">
+        <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto custom-scrollbar">
           {menuItems.filter(item => item.roles.includes(user.role)).map(item => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id as any)}
               className={`
-                w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200
-                ${activeTab === item.id ? 'bg-primary text-white shadow-lg shadow-primary-glow' : 'hover:bg-white/5 text-text-muted'}
+                w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-300 group
+                ${activeTab === item.id 
+                  ? 'bg-primary text-white shadow-lg shadow-primary-glow translate-x-1' 
+                  : 'hover:bg-white/5 text-text-muted hover:text-text'}
               `}
             >
-              <item.icon size={20} className={activeTab === item.id ? 'text-white' : 'text-primary'} />
-              {isSidebarOpen && <span className="font-bold text-sm tracking-tight">{item.label}</span>}
+              <div className={`
+                p-2 rounded-lg transition-colors
+                ${activeTab === item.id ? 'bg-white/20' : 'bg-white/5 group-hover:bg-primary/10'}
+              `}>
+                <item.icon size={18} className={activeTab === item.id ? 'text-white' : 'text-primary'} />
+              </div>
+              {isSidebarOpen && (
+                <span className="font-bold text-sm tracking-tight whitespace-nowrap overflow-hidden">
+                  {item.label}
+                </span>
+              )}
             </button>
           ))}
         </nav>
