@@ -364,14 +364,6 @@ const MetricCard: React.FC<{ label: string; value: any; icon: any; color: string
       )}
     </motion.div>
   );
-};ng-widest">{label}</p>
-      {progress !== undefined && (
-        <div className="progress-bar h-1 mt-4">
-          <div className="progress-fill" style={{ width: `${progress}%`, backgroundColor: 'currentColor' }} />
-        </div>
-      )}
-    </motion.div>
-  );
 };
 
 export default SystemDashboard;
